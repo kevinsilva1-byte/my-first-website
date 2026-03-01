@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pausas Activas – Docente</title>
+
+<style>
+/* ------------------------------------------------------ */
+/*                 ESTILO GLOBAL - NGL VIBE               */
+/* ------------------------------------------------------ */
+body {
+    margin: 0;
+    font-family: "Helvetica", Arial, sans-serif;
+    background: linear-gradient(180deg, #ffa4d3, #ffbf8b);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    color: #333;
+    overflow: hidden;
+}
+
+.app {
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Encabezado */
+header {
+    padding: 25px;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.25);
+}
+
+/* RELOJ */
+#clock {
+    text-align: center;
+    font-size: 22px;
+    margin-top: -10px;
+    color: white;
+    opacity: 0.9;
+    font-weight: bold;
+}
+
+/* Vistas */
+.view {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.active { display: block; }
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 22px;
+    margin-bottom: 18px;
+    font-size: 18px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+}
+
+.card h3 { margin: 0; }
+
+/* Botón estilo NGL */
+.btn {
+    background: #ff3f7a;
+    padding: 16px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    border: none;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 18px;
+}
+
+.btn:active { transform: scale(0.97); }
+
+/* Navegación inferior */
+nav {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255,255,255,0.25);
+    padding: 12px;
+    backdrop-filter: blur(12px);
+}
+
+nav button {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    color: white;
+    font-size: 16px;
+}
+
+.activeTab {
+    background: rgba(255,255,255,0.45);
+    color: #ff3f7a;
+    font-weight: bold;
+}
+
+/* Timer */
+#timer {
+    text-align: center;
+    font-size: 58px;
+    margin-top: 20px;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* ------------------------------- */
+/*        PANEL DE NOTIFICACIONES */
+/* ------------------------------- */
+#notificaciones {
+    position: fixed;
+    right: -330px;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    padding: 20px;
+    transition: 0.3s ease;
+    z-index: 100;
+}
+
+#notificaciones.open {
+    right: 0;
+}
+
+.notif-item {
+    padding: 12px;
+    background: #ffe3f0;
+    margin-bottom: 12px;
+    border-radius: 15px;
+    font-size: 15px;
+}
+
+/* botón cerrar */
+#cerrarNotif {
+    background: #ff3f7a;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+    border-radius: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+/* Botón flotante notificaciones */
+#notifButton {
+    position: fixed;
+    bottom: 80px;
+    right: 25px;
+    background: #ffffffaa;
+    padding: 15px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    border: none;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+}
+
+/* METAS */
+.meta-progress {
+    height: 12px;
+    background: #ffe4ee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.meta-bar {
+    height: 12px;
+    background: #ff3f7a;
+    width: 0%;
+    transition: 0.4s;
+}
+.badge {
+    background: #fff;
+    border-radius: 18px;
+    padding: 6px 12px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-top: 6px;
+    font-weight: bold;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>Pausas Activas</header>
+<div id="clock">00:00:00</div>
+
+<!-- ------------------------------------------------------ -->
+<!--                   VISTA: BIBLIOTECA                   -->
+<!-- ------------------------------------------------------ -->
+<div id="biblioteca" class="view active">
+
+    <!-- EJERCICIOS ORIGINALES (SE MANTIENEN) -->
+    <div class="card">
+        <h3>Estiramiento de cuello</h3>
+        <p>Duración: 30 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento de cuello', 30)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Movimiento de hombros</h3>
+        <p>Duración: 45 s</p>
+        <button class="btn" onclick="iniciarRutina('Movimiento de hombros', 45)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Respiración profunda</h3>
+        <p>Duración: 60 s</p>
+        <button class="btn" onclick="iniciarRutina('Respiración profunda', 60)">Iniciar</button>
+    </div>
+
+    <!-- ----------------------------------------- -->
+    <!--     NUEVOS 20 EJERCICIOS DE PAUSAS        -->
+    <!-- ----------------------------------------- -->
+
+    <div class="card">
+        <h3>Estiramiento de espalda alta</h3>
+        <p>Duración: 40 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento de espalda alta', 40)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Giro suave de tronco</h3>
+        <p>Duración: 35 s</p>
+        <button class="btn" onclick="iniciarRutina('Giro suave de tronco', 35)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Estiramiento de piernas sentado</h3>
+        <p>Duración: 45 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento de piernas sentado', 45)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Marcha en el lugar</h3>
+        <p>Duración: 50 s</p>
+        <button class="btn" onclick="iniciarRutina('Marcha en el lugar', 50)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Saltitos suaves</h3>
+        <p>Duración: 40 s</p>
+        <button class="btn" onclick="iniciarRutina('Saltitos suaves', 40)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Estiramiento lateral</h3>
+        <p>Duración: 30 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento lateral', 30)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Movilidad de muñecas</h3>
+        <p>Duración: 20 s</p>
+        <button class="btn" onclick="iniciarRutina('Movilidad de muñecas', 20)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Caminata breve</h3>
+        <p>Duración: 60 s</p>
+        <button class="btn" onclick="iniciarRutina('Caminata breve', 60)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Respiración cuadrada</h3>
+        <p>Duración: 45 s</p>
+        <button class="btn" onclick="iniciarRutina('Respiración cuadrada', 45)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Golpecitos energizantes</h3>
+        <p>Duración: 30 s</p>
+        <button class="btn" onclick="iniciarRutina('Golpecitos energizantes', 30)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Estiramiento de brazos</h3>
+        <p>Duración: 35 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento de brazos', 35)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Movilidad de tobillos</h3>
+        <p>Duración: 25 s</p>
+        <button class="btn" onclick="iniciarRutina('Movilidad de tobillos', 25)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Levantamiento de rodillas</h3>
+        <p>Duración: 35 s</p>
+        <button class="btn" onclick="iniciarRutina('Levantamiento de rodillas', 35)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Giro de hombros hacia atrás</h3>
+        <p>Duración: 30 s</p>
+        <button class="btn" onclick="iniciarRutina('Giro de hombros hacia atrás', 30)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Estiramiento de pecho</h3>
+        <p>Duración: 35 s</p>
+        <button class="btn" onclick="iniciarRutina('Estiramiento de pecho', 35)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Respiración guiada rápida</h3>
+        <p>Duración: 20 s</p>
+        <button class="btn" onclick="iniciarRutina('Respiración guiada rápida', 20)">Iniciar</button>
+    </div>
+
+    <div class="card">
+        <h3>Yoga de manos</h3>
+        <p>Duración: 25 s</p>
+        <button class="btn" onclick="iniciarRutina('Yoga de manos', 25)">Iniciar</button>
+    </div>
+
+</div>
+
+<!-- ------------------------------------------------------ -->
+<!--                   VISTA: HISTORIAL                    -->
+<!-- ------------------------------------------------------ -->
+<div id="historial" class="view">
+    <h2 style="color:white;text-shadow:0 2px 4px rgba(0,0,0,.3)">Historial</h2>
+    <div id="listaHistorial"></div>
+</div>
+
+<!-- ------------------------------------------------------ -->
+<!--                 VISTA: EJECUCIÓN                      -->
+<!-- ------------------------------------------------------ -->
+<div id="ejecucion" class="view">
+    <h2 id="rutinaNombre" style="color:white;text-align:center">Rutina</h2>
+    <div id="timer">00:00</div>
+
+    <button class="btn" onclick="pausar()">Pausar</button>
+    <button class="btn" onclick="reiniciar()">Reiniciar</button>
+</div>
+
+<!-- ------------------------------------------------------ -->
+<!--                  VISTA: METAS Y DESAFÍOS              -->
+<!-- ------------------------------------------------------ -->
+<div id="metas" class="view">
+
+    <h2 style="color:white;text-shadow:0 2px 4px rgba(0,0,0,.3)">Metas Diarias</h2>
+
+    <div class="card">
+        <h3>Completar 3 pausas hoy</h3>
+        <small id="meta1Label">0/3 completadas</small>
+
+        <div class="meta-progress">
+            <div id="meta1Bar" class="meta-bar"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Alcanzar 10 minutos de actividad</h3>
+        <small id="meta2Label">0/10 minutos</small>
+
+        <div class="meta-progress">
+            <div id="meta2Bar" class="meta-bar"></div>
+        </div>
+    </div>
+
+    <h2 style="margin-top:30px;color:white;text-shadow:0 2px 4px rgba(0,0,0,.3)">Desafíos</h2>
+
+    <div class="card">
+        <h3>Insignias logradas</h3>
+        <div id="badges"></div>
+    </div>
+
+</div>
+
+<!-- ------------------------------------------------------ -->
+<!--                 NAVEGACIÓN INFERIOR                    -->
+<!-- ------------------------------------------------------ -->
+<nav>
+    <button class="activeTab" onclick="cambiarVista('biblioteca', this)">Biblioteca</button>
+    <button onclick="cambiarVista('historial', this)">Historial</button>
+    <button onclick="cambiarVista('ejecucion', this)">Ejecución</button>
+    <button onclick="cambiarVista('metas', this)">Metas</button>
+</nav>
+
+<!-- BOTÓN NOTIFICACIONES -->
+<button id="notifButton" onclick="toggleNotificaciones()">🔔</button>
+
+<!-- PANEL -->
+<div id="notificaciones">
+    <button id="cerrarNotif" onclick="toggleNotificaciones()">Cerrar ❌</button>
+    <h3>Notificaciones</h3>
+    <div id="notifList"></div>
+</div>
+
+</div>
+
+<script>
+/* ---------------------- */
+/* Cambio de vistas       */
+/* ---------------------- */
+function cambiarVista(vista, boton) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById(vista).classList.add("active");
+
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("activeTab"));
+    boton.classList.add("activeTab");
+}
+
+/* ---------------------- */
+/* Temporizador           */
+/* ---------------------- */
+let tiempo = 0;
+let timer = null;
+let enMarcha = false;
+let historial = [];
+let pausasCompletadas = 0;
+let minutosAcumulados = 0;
+
+function iniciarRutina(nombre, duracion) {
+    cambiarVista("ejecucion", document.querySelectorAll("nav button")[2]);
+
+    document.getElementById("rutinaNombre").innerText = nombre;
+    tiempo = duracion;
+
+    actualizarTimer();
+    agregarHistorial(`Iniciaste: ${nombre}`);
+
+    if (timer) clearInterval(timer);
+    enMarcha = true;
+
+    timer = setInterval(() => {
+        if (!enMarcha) return;
+
+        tiempo--;
+        actualizarTimer();
+
+        if (tiempo <= 0) {
+            clearInterval(timer);
+            rutinaTerminada(nombre);
+        }
+    }, 1000);
+}
+
+function actualizarTimer() {
+    let m = Math.floor(tiempo / 60);
+    let s = tiempo % 60;
+    document.getElementById("timer").innerText =
+        `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function pausar() { enMarcha = !enMarcha; }
+function reiniciar() { enMarcha = false; actualizarTimer(); }
+
+/* ---------------------- */
+/* Rutina completada      */
+/* ---------------------- */
+function rutinaTerminada(nombre) {
+    agregarHistorial(`Completaste: ${nombre}`);
+    agregarNotificacion(`¡Rutina completada: ${nombre}! 🎉`);
+
+    pausasCompletadas++;
+    minutosAcumulados += 1;
+
+    actualizarMetas();
+
+    if (pausasCompletadas === 3) {
+        agregarInsignia("💎 Maestro de pausas");
+    }
+}
+
+/* ---------------------- */
+/* Historial              */
+/* ---------------------- */
+function agregarHistorial(texto) {
+    historial.unshift(texto);
+    let html = "";
+    historial.forEach(h => html += `<div class="card">${h}</div>`);
+    document.getElementById("listaHistorial").innerHTML = html;
+}
+
+/* ---------------------- */
+/* Notificaciones         */
+/* ---------------------- */
+function agregarNotificacion(texto) {
+    let div = document.createElement("div");
+    div.className = "notif-item";
+    div.innerText = texto;
+    document.getElementById("notifList").prepend(div);
+}
+
+function toggleNotificaciones() {
+    document.getElementById("notificaciones").classList.toggle("open");
+}
+
+/* ---------------------- */
+/* Metas y desafíos       */
+/* ---------------------- */
+function actualizarMetas() {
+    let m1 = Math.min(100, (pausasCompletadas / 3) * 100);
+    document.getElementById("meta1Bar").style.width = m1 + "%";
+    document.getElementById("meta1Label").innerText = `${pausasCompletadas}/3 completadas`;
+
+    let m2 = Math.min(100, (minutosAcumulados / 10) * 100);
+    document.getElementById("meta2Bar").style.width = m2 + "%";
+    document.getElementById("meta2Label").innerText = `${minutosAcumulados}/10 minutos`;
+}
+
+function agregarInsignia(nombre) {
+    let badge = document.createElement("div");
+    badge.className = "badge";
+    badge.innerText = nombre;
+    document.getElementById("badges").appendChild(badge);
+}
+
+/* ---------------------- */
+/* RELOJ                  */
+/* ---------------------- */
+function actualizarReloj() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,"0");
+    const m = String(now.getMinutes()).padStart(2,"0");
+    const s = String(now.getSeconds()).padStart(2,"0");
+    document.getElementById("clock").innerText = `${h}:${m}:${s}`;
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+</script>
+
+</body>
+</html>
